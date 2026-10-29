@@ -198,6 +198,18 @@ export interface ChatMessage {
   created_at: string;
 }
 
+export interface AiSuggestion {
+  id: string;
+  project_id: string;
+  kind: 'plan' | 'chat_tasks' | 'chat_summary';
+  status: 'pending' | 'applied' | 'dismissed';
+  title: string;
+  summary: string;
+  payload: unknown;
+  created_by: string | null;
+  created_at: string;
+}
+
 export interface AvailabilityPoll {
   id: string;
   project_id: string;
