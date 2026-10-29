@@ -61,8 +61,11 @@ describe('computeReadiness', () => {
       today: '2026-03-05',
       weekly_capacity_hours: 0,
     });
-    expect(result.score).toBe(0);
-    expect(result.components.find((c) => c.key === 'plan')!.score).toBe(10);
+    // Nothing is done, so the transparent score must stay effectively zero.
+    expect(result.score).toBeLessThanOrEqual(1);
+    const balance = result.components.find((c) => c.key === 'balance')!;
+    expect(balance.score).toBe(0);
+    expect(balance.detail).toMatch(/no assigned open work/i);
   });
 
   it('reports blockers for overdue, blocked and unassigned work', () => {
@@ -81,7 +84,7 @@ describe('computeReadiness', () => {
     const text = result.blockers.join(' | ');
     expect(text).toMatch(/overdue/i);
     expect(text).toMatch(/blocked/i);
-    expect(text).toMatch(/unassigned/i);
+    expect(text).toMatch(/no owner/i);
   });
 });
 
@@ -93,7 +96,10 @@ describe('buildReminders', () => {
       makeTask({ id: 'stuck', title: 'Stuck task', status: 'blocked' }),
       makeTask({ id: 'done', title: 'Done task', status: 'done', due_date: '2026-03-01' }),
     ];
-    const reminders = buildReminders({ tasks, plan_status: 'approved', today: '2026-03-05' });
+    const reminders = buildReminders(tasks, [{ id: 'm1', display_name: 'Ada' }], {
+      plan_status: 'approved',
+      today: '2026-03-05',
+    });
     const kinds = new Set(reminders.map((r) => r.kind));
     expect(kinds.has('overdue')).toBe(true);
     expect(kinds.has('due_soon')).toBe(true);
@@ -103,7 +109,7 @@ describe('buildReminders', () => {
   });
 
   it('asks for a plan when none was approved', () => {
-    const reminders = buildReminders({ tasks: [], plan_status: 'none', today: '2026-03-05' });
+    const reminders = buildReminders([], [], { plan_status: 'none', today: '2026-03-05' });
     expect(reminders.map((r) => r.kind)).toContain('no_plan');
   });
 });

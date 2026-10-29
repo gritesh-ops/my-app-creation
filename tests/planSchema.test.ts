@@ -32,7 +32,7 @@ describe('parsePlanPayload', () => {
   it('accepts a well formed AI plan', () => {
     const parsed = parsePlanPayload(validPlan);
     expect(parsed.tasks).toHaveLength(2);
-    expect(parsed.tasks[1].depends_on).toEqual(['t1']);
+    expect(parsed.tasks[1].depends_on).toEqual([parsed.tasks[0].key]);
     expect(parsed.summary).toContain('design');
   });
 
@@ -41,11 +41,20 @@ describe('parsePlanPayload', () => {
     expect(() => parsePlanPayload({ summary: 'x' })).toThrow(/task/i);
   });
 
-  it('rejects non object payloads and non numeric hours', () => {
+  it('rejects non object payloads', () => {
     expect(() => parsePlanPayload('nope')).toThrow(AiPlanError);
+    expect(() => parsePlanPayload(null)).toThrow(AiPlanError);
+  });
+
+  it('repairs unusable numbers instead of trusting the model', () => {
     const bad = structuredClone(validPlan);
     (bad.tasks[0] as unknown as { estimated_hours: unknown }).estimated_hours = 'lots';
-    expect(() => parsePlanPayload(bad)).toThrow(AiPlanError);
+    (bad.tasks[1] as unknown as { complexity: unknown }).complexity = 99;
+    const parsed = parsePlanPayload(bad);
+    expect(Number.isFinite(parsed.tasks[0].estimated_hours)).toBe(true);
+    expect(parsed.tasks[0].estimated_hours).toBeGreaterThanOrEqual(0.5);
+    expect(parsed.tasks[0].estimated_hours).toBeLessThanOrEqual(60);
+    expect(parsed.tasks[1].complexity).toBe(5);
   });
 
   it('normalises missing optional fields instead of failing', () => {

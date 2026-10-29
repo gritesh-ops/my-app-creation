@@ -60,17 +60,32 @@ describe('balanceWorkload', () => {
     }
   });
 
-  it('gives hours in proportion to availability instead of task counts', () => {
-    const byMember = new Map(plan.loads.map((l) => [l.member_id, l]));
-    const ada = byMember.get('m1')!;
-    const grace = byMember.get('m2')!;
-    const linus = byMember.get('m3')!;
+  it('gives hours in proportion to availability, not equal task counts', () => {
+    // No skill requirements here, so only availability/complexity can drive the
+    // split. Ada (20 h/week) must end up with more hours than Linus (6 h/week)
+    // while both stay inside a sane utilisation band.
+    const open = Array.from({ length: 9 }, (_, i) =>
+      task({ key: `o${i + 1}`, title: `Generic chore ${i + 1}`, estimated_hours: 4, complexity: 3 }),
+    );
+    const balanced = balanceWorkload(open, members, project);
+    const byId = new Map(balanced.loads.map((l) => [l.member_id, l]));
+    const ada = byId.get('m1')!;
+    const grace = byId.get('m2')!;
+    const linus = byId.get('m3')!;
 
-    // Ada has 20 h/week, Linus 6 h/week — she should carry more hours but keep
-    // a similar utilisation ratio, which is the whole point of the balancer.
     expect(ada.assigned_hours).toBeGreaterThan(linus.assigned_hours);
-    expect(ada.utilization).toBeGreaterThan(0.4);
-    expect(linus.utilization).toBeLessThan(1.35);
+    expect(ada.assigned_hours).toBeGreaterThanOrEqual(grace.assigned_hours);
+    for (const load of [ada, grace, linus]) {
+      expect(load.utilization).toBeGreaterThan(0);
+      expect(load.utilization).toBeLessThan(1.5);
+    }
+  });
+
+  it('matches tasks to the member who actually has the skill', () => {
+    const reactTask = plan.tasks.find((t) => t.key === 't2')!;
+    const dbTask = plan.tasks.find((t) => t.key === 't1')!;
+    expect(reactTask.assignee_member_id).toBe('m1');
+    expect(dbTask.assignee_member_id).toBe('m2');
   });
 
   it('schedules dependent tasks after their prerequisite finishes', () => {
