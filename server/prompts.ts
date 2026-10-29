@@ -108,7 +108,7 @@ INSTRUCTIONS
 - Produce 8 to 14 top-level tasks covering the whole project from kick-off to submission.
 - Give each top-level task 1 to 4 subtasks. Subtask hours must add up to roughly the parent task's hours.
 - Order tasks so that research and design come before build, and testing/reporting come last.
-- Respect the real calendar: the work must be finishable between ${input.start_date} and ${input.project.deadline}.
+- Respect the real calendar: the work must be finishable between ${input.project.start_date} and ${input.project.deadline}.
 - Keep the total effort realistic for a team of ${Math.max(input.members.length, 1)} part-time students.
 - Include at least one testing/QA task and one documentation or report task.
 

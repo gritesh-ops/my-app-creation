@@ -89,16 +89,13 @@ function leafDependencies(
  * Topological order of leaf tasks. If the AI produced a dependency cycle we
  * fall back to input order for the offending tasks instead of hanging.
  */
-function orderLeaves(
-  leaves: PlannedTaskInput[],
-  depsOf: Map<string, string[]>,
-): PlannedTaskInput[] {
+function orderLeaves(leaves: PlannedTask[], depsOf: Map<string, string[]>): PlannedTask[] {
   const byKey = new Map(leaves.map((t) => [t.key, t]));
   const remaining = new Map<string, Set<string>>();
   for (const task of leaves) {
     remaining.set(task.key, new Set((depsOf.get(task.key) ?? []).filter((k) => byKey.has(k))));
   }
-  const ordered: PlannedTaskInput[] = [];
+  const ordered: PlannedTask[] = [];
   const placed = new Set<string>();
 
   // Heaviest-first tie break, so long tasks get the pick of the team.

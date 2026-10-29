@@ -141,7 +141,7 @@ export function createApp(config: ServerConfig): express.Express {
 
   /* ------------------------------ auth ------------------------------ */
 
-  const authenticate = async (req: ApiRequest, res: Response, next: NextFunction) => {
+  const authenticate = async (req: ApiRequest, _res: Response, next: NextFunction) => {
     try {
       if (!supabaseConfigured(config)) {
         throw new ApiError(
