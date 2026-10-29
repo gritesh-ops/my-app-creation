@@ -9,6 +9,7 @@ import { initSupabase } from './lib/supabase.js';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element #root is missing from index.html');
+const root = createRoot(container);
 
 function MissingSetup({ detail }: { detail: string }) {
   return (
