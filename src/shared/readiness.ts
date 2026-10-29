@@ -79,7 +79,8 @@ export function computeReadiness(input: ReadinessInput): ReadinessResult {
     );
   }
   const memberHours = [...perMember.values()];
-  let balanceScore = 50;
+  // Nothing to balance yet: an empty project must not earn free readiness points.
+  let balanceScore = totalHours > 0 ? 50 : 0;
   if (memberHours.length > 1) {
     const mean = memberHours.reduce((a, b) => a + b, 0) / memberHours.length;
     const max = Math.max(...memberHours);
