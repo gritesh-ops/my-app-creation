@@ -67,5 +67,3 @@ loadRuntimeConfig()
   .catch((error: unknown) => {
     root.render(<MissingSetup detail={error instanceof Error ? error.message : 'Unknown configuration error.'} />);
   });
-
-const root = createRoot(container);
