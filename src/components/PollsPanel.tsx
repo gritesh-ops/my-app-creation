@@ -3,7 +3,7 @@ import { Alert, Badge, Button, Card, CardHead, EmptyState, Field, Modal, Spinner
 import { useAuth } from '../auth/AuthProvider.js';
 import { fail, type ProjectBundle } from '../lib/data.js';
 import { supabase } from '../lib/supabase.js';
-import type { Poll, PollOption, PollVote } from '../shared/types.js';
+import type { AvailabilityPoll, PollOption, PollVote } from '../shared/types.js';
 
 interface SlotDraft {
   starts_at: string;
@@ -31,7 +31,7 @@ function nextEvening(): string {
 export default function PollsPanel({ bundle }: { bundle: ProjectBundle }) {
   const { user } = useAuth();
   const { project, me, members } = bundle;
-  const [polls, setPolls] = useState<Poll[] | null>(null);
+  const [polls, setPolls] = useState<AvailabilityPoll[] | null>(null);
   const [options, setOptions] = useState<PollOption[]>([]);
   const [votes, setVotes] = useState<PollVote[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export default function PollsPanel({ bundle }: { bundle: ProjectBundle }) {
         setPolls([]);
         return;
       }
-      const list = (pollRows ?? []) as Poll[];
+      const list = (pollRows ?? []) as AvailabilityPoll[];
       setPolls(list);
       if (list.length === 0) return;
 
@@ -82,7 +82,7 @@ export default function PollsPanel({ bundle }: { bundle: ProjectBundle }) {
       .select('*')
       .eq('project_id', project.id)
       .order('created_at', { ascending: false });
-    const list = (pollRows ?? []) as Poll[];
+    const list = (pollRows ?? []) as AvailabilityPoll[];
     setPolls(list);
     if (list.length === 0) {
       setOptions([]);
@@ -174,7 +174,7 @@ export default function PollsPanel({ bundle }: { bundle: ProjectBundle }) {
     }
   }
 
-  async function deletePoll(poll: Poll) {
+  async function deletePoll(poll: AvailabilityPoll) {
     setError(null);
     const { error: deleteError } = await supabase().from('polls').delete().eq('id', poll.id);
     if (deleteError) {
@@ -210,7 +210,7 @@ export default function PollsPanel({ bundle }: { bundle: ProjectBundle }) {
           </CardBody>
         </Card>
       ) : (
-        polls.map((poll) => {
+        polls.map((poll: AvailabilityPoll) => {
           const pollOptions = options.filter((option) => option.poll_id === poll.id);
           return (
             <Card key={poll.id}>

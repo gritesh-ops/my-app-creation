@@ -9,6 +9,12 @@
 import { Alert, Badge, Button, Progress } from '../components/ui.js';
 import type { PlanResult } from '../shared/types.js';
 
+function progressTone(value: number) {
+  if (value > 1.05) return 'danger' as const;
+  if (value > 0.9) return 'warn' as const;
+  return 'ok' as const;
+}
+
 function utilisationTone(value: number) {
   if (value > 1.05) return 'danger' as const;
   if (value > 0.9) return 'warn' as const;
@@ -77,7 +83,7 @@ export default function PlanPreview({
                   {Math.round(load.assigned_hours * 10) / 10}h / {Math.round(load.capacity_hours)}h
                 </span>
               </div>
-              <Progress value={load.utilization * 100} tone={utilisationTone(load.utilization)} />
+              <Progress value={load.utilization * 100} tone={progressTone(load.utilization)} />
               <div className="row row--between small muted">
                 <span>
                   {load.task_count} task{load.task_count === 1 ? '' : 's'} · {Math.round(load.skill_match_pct)}% skill

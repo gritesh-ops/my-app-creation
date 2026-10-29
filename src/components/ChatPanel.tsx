@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Badge, Button, Card, CardHead, EmptyState, Field, Modal, Spinner, TextArea, TextInput } from './ui.js';
+import { Alert, Badge, Button, Card, CardHead, EmptyState, Modal, Spinner, TextArea } from './ui.js';
 import { useAuth } from '../auth/AuthProvider.js';
 import { requestChatSummary, type ChatSummaryResponse } from '../lib/api.js';
 import { fail, type ProjectBundle } from '../lib/data.js';
